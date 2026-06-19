@@ -3,271 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUG ELECTORAL PORTAL</title>
+    <title>SUG Electoral Portal</title>
     <style>
-        /* --- Global Design System Architecture --- */
-        :root {
-            --bg-primary: #0a0a0c;
-            --card-bg: #121215;
-            --border-color: #26262b;
-            --text-main: #f3f4f6;
-            --text-muted: #8e919a;
-            --accent-blue: #0088ff;
-            --accent-success: #10b981;
-            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            background-color: var(--bg-primary);
-            color: var(--text-main);
-            font-family: var(--font-stack);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 440px;
-        }
-
-        /* --- Typography & Header Structures --- */
-        .portal-header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .portal-header h1 {
-            font-size: 1.4rem;
-            font-weight: 800;
-            letter-spacing: 0.15em;
-            color: var(--text-main);
-            margin-bottom: 6px;
-        }
-
-        .subtitle {
-            font-size: 0.7rem;
-            font-weight: 600;
-            letter-spacing: 0.2em;
-            color: var(--accent-blue);
-        }
-
-        .divider {
-            border: 0;
-            height: 1px;
-            background-color: var(--border-color);
-            margin-bottom: 24px;
-        }
-
-        /* --- Container Components --- */
-        .portal-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 28px 24px;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
-            margin-bottom: 8px;
-        }
-
-        .instruction {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-
-        /* --- Interactive Input Components --- */
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.7rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .form-group input {
-            width: 100%;
-            background-color: var(--bg-primary);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            color: var(--text-main);
-            padding: 12px 16px;
-            font-size: 0.95rem;
-            font-family: monospace;
-            letter-spacing: 0.05em;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent-blue);
-        }
-
-        /* --- Interactive Buttons --- */
-        .btn {
-            width: 100%;
-            border: none;
-            border-radius: 4px;
-            padding: 14px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            cursor: pointer;
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-primary {
-            background-color: var(--text-main);
-            color: var(--bg-primary);
-        }
-
-        .btn-success {
-            background-color: var(--accent-success);
-            color: #ffffff;
-        }
-
-        /* --- Utility Display States --- */
-        .hidden {
-            display: none !important;
-        }
+        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #0f0f0f; color: white; }
+        .container { width: 100%; max-width: 400px; text-align: center; }
+        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-
-    <div class="app-container">
-        <!-- Header Banner -->
-        <header class="portal-header">
-            <h1>SUG ELECTORAL PORTAL</h1>
-            <p class="subtitle">CENTRALIZED VERIFICATION & BALLOT NETWORK</p>
-        </header>
-
-        <hr class="divider">
-
-        <!-- Stage 1: Identity Roll Check -->
-        <main class="portal-card" id="verification-pane">
-            <h2 class="section-title">Identity Roll Check</h2>
-            <p class="instruction">Enter your institutional matriculation number to authenticate your voting status and dispatch your access token.</p>
-            
-            <div class="form-group">
-                <label for="matric-input">MATRICULATION NUMBER</label>
-                <input 
-                    type="text" 
-                    id="matric-input" 
-                    placeholder="e.g., UU/2026/MLS/0000" 
-                    autocomplete="off"
-                    spellcheck="false"
-                >
-            </div>
-
-            <button class="btn btn-primary" id="btn-verify" onclick="handleVoterVerification()">
-                VERIFY & DISPATCH TOKEN
-            </button>
-        </main>
-
-        <!-- Stage 2: Token Validation (Initially Hidden) -->
-        <main class="portal-card hidden" id="token-pane">
-            <h2 class="section-title">Security Key Authorization</h2>
-            <p class="instruction" id="token-instruction">A 6-digit access code has been securely routed to your registered email registry handle.</p>
-            
-            <div class="form-group">
-                <label for="token-input">ENTER ACCESS TOKEN</label>
-                <input 
-                    type="text" 
-                    id="token-input" 
-                    placeholder="000000" 
-                    maxlength="6"
-                    autocomplete="off"
-                >
-            </div>
-
-            <button class="btn btn-success" id="btn-auth" onclick="handleTokenAuthorization()">
-                AUTHORIZE BALLOT ACCESS
-            </button>
-        </main>
+    <div class="container">
+        <h2>Identity Roll Check</h2>
+        <input type="text" id="matricInput" placeholder="Enter Matric Number" style="text-transform: uppercase;">
+        <button onclick="verifyStudent()">VERIFY IDENTITY</button>
     </div>
 
     <script>
-        // Production Cloud API Base Target Address Mapping
-        const TARGET_ENDPOINTS = "https://sug-voting-system.onrender.com";
-        let verifiedMatric = "";
+        // REPLACE THIS WITH YOUR LIVE RENDER URL (No trailing slash)
+        const API_BASE = "https://sug-voting-system.onrender.com";
 
-        async function handleVoterVerification() {
-            const btn = document.getElementById("btn-verify");
-            const matricInput = document.getElementById("matric-input");
-            const matricValue = matricInput ? matricInput.value.trim().toUpperCase() : "";
-
-            if (!matricValue) {
-                alert("Validation Error: Please enter your matriculation number.");
+        async function verifyStudent() {
+            const matric = document.getElementById('matricInput').value.trim().toUpperCase();
+            
+            if (!matric) {
+                alert("Please enter a matric number.");
                 return;
             }
-
-            btn.disabled = true;
-            btn.innerText = "PROCESSING DISPATCH...";
 
             try {
-                const response = await fetch(`${TARGET_ENDPOINTS}/api/send-token`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ matric: matricValue })
+                const response = await fetch(`${API_BASE}/api/send-token`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ matric: matric })
                 });
 
-                const data = await response.json();
+                const result = await response.json();
 
-                if (!response.ok) {
-                    alert(`Access Alert: ${data.message || 'The verification node rejected this transaction.'}`);
-                    btn.disabled = false;
-                    btn.innerText = "VERIFY & DISPATCH TOKEN";
-                    return;
+                if (response.ok) {
+                    alert("Success: " + result.message + "\nCheck email: " + result.target);
+                } else {
+                    alert("Access Alert: " + result.message);
                 }
-
-                verifiedMatric = matricValue;
-
-                // Toggle visibility views smoothly
-                document.getElementById("verification-pane").classList.add("hidden");
-                document.getElementById("token-instruction").innerText = `A 6-digit access code has been securely routed to your email handle: ${data.target}`;
-                document.getElementById("token-pane").classList.remove("hidden");
-
-            } catch (networkError) {
-                console.error("Network connection failure:", networkError);
-                alert("System Notice: Unable to connect to the verification node. Please check your internet connection and try again.");
-                btn.disabled = false;
-                btn.innerText = "VERIFY & DISPATCH TOKEN";
+            } catch (error) {
+                alert("Connection Error: Check your internet or Render status.");
+                console.error("Fetch error:", error);
             }
-        }
-
-        async function handleTokenAuthorization() {
-            const tokenInput = document.getElementById("token-input");
-            const tokenValue = tokenInput ? tokenInput.value.trim() : "";
-
-            if (tokenValue.length !== 6 || isNaN(tokenValue)) {
-                alert("Validation Error: Please input a valid 6-digit code.");
-                return;
-            }
-
-            alert("Token authorization logic accepted. Accessing ballot sheet layout...");
         }
     </script>
 </body>
