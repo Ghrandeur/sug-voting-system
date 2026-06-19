@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SUG Secure Voting Node</title>
+    <style>
+        :root {
+            --primary: #0f172a; --accent: #1e3a8a; --success: #16a34a;
+            --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0;
+        }
+        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 0; }
+        header { background: var(--primary); color: white; padding: 2rem 1rem; text-align: center; border-bottom: 4px solid var(--accent); }
+        header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
+        header p { margin: 0.4rem 0 0; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; }
+        .wrapper { max-width: 650px; margin: 3rem auto; padding: 0 1rem; box-sizing: border-box; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .card.visible { display: block; }
+        .card h2 { margin-top: 0; font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--primary); }
+        .input-group { margin-bottom: 1.25rem; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; color: #475569; }
+        .input-group input { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 1rem; background: #fdfdfd; }
+        .btn { width: 100%; background: var(--accent); color: white; border: none; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #172554; }
+        .voter-badge { background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 2rem; display: flex; justify-content: space-between; border-left: 4px solid var(--accent); font-weight: 500; }
+        
+        /* Positioning Section Layout blocks */
+        .position-block { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed var(--border); }
+        .position-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .ballot-lane { display: flex; flex-direction: column; gap: 0.75rem; }
+        .candidate-node { border: 2px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: white; transition: all 0.2s; }
+        .candidate-node.picked { border-color: var(--success); background: #f0fdf4; }
+        .candidate-node span { font-weight: 600; }
+        .btn-lock { background: var(--success); font-size: 1rem; margin-top: 1rem; }
+        .btn-lock:hover { background: #15803d; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SUG ELECTORAL PORTAL</h1>
+    <p>Centralized Verification & Ballot Network</p>
+</header>
+
+<div class="wrapper">
+
+    <!-- STATE 1: IDENTITY RECONNAISSANCE -->
+    <div id="panel1" class="card visible">
+        <h2>Identity Roll Check</h2>
+        <form onsubmit="initiateIdentityChallenge(event)">
+            <div class="input-group">
+                <label>Matriculation ID Number</label>
+                <input type="text" id="voterMatricInput" placeholder="e.g., UU/2026/MLS/001" required>
+            </div>
+            <button type="submit" class="btn">Verify and Dispatch Token</button>
+        </form>
+    </div>
+
+    <!-- STATE 2: CHALLENGE-RESPONSE -->
+    <div id="panel2" class="card">
+        <h2>Two-Factor Challenge Gate</h2>
+        <form onsubmit="submitChallengeToken(event)">
+            <div class="input-group">
+                <label>Dynamic OTP Security Code</label>
+                <input type="password" id="voterTokenInput" placeholder="Enter 6-digit credential" maxlength="6" required>
+            </div>
+            <button type="submit" class="btn">Authorize Session</button>
+        </form>
+    </div>
+
+    <!-- STATE 3: FULL ELECTORAL LEDGER -->
+    <div id="panel3" class="card">
+        <div class="voter-badge">
+            <span>Identity Token: <strong id="voterBadgeId">...</strong></span>
+            <span style="color: var(--success);">● Session Secured</span>
+        </div>
+        <h2>Official Executive Vote Selection</h2>
+        <form onsubmit="commitElectoralTransaction(event)">
+            
+            <!-- Dynamic Injection Point for the 20 Positions -->
+            <div id="dynamicBallotContainer"></div>
+
+            <button type="submit" class="btn btn-lock">Cast Encrypted Ballot Ledger</button>
+        </form>
+    </div>
+
+</div>
+
+<script>
+    const TARGET_ENDPOINTS = "http://127.0.0.1:3000/api";
+    let secureContextMatric = "";
+    let secureContextToken = "";
+    let ballotSchemaCache = {};
+
+    function routeToPanel(panelId) {
+        document.querySelectorAll(".card").forEach(c => c.classList.remove("visible"));
+        document.getElementById(panelId).classList.add("visible");
+    }
+
+    // Dynamic rendering calculation logic
+    async function fetchAndRenderBallot() {
+        try {
+            const res = await fetch(`${TARGET_ENDPOINTS}/ballot-schema`);
+            ballotSchemaCache = await res.json();
+            const container = document.getElementById("dynamicBallotContainer");
+            container.innerHTML = ""; // Reset
+
+            Object.keys(ballotSchemaCache).forEach((key) => {
+                const position = ballotSchemaCache[key];
+                
+                let positionHtml = `
+                    <div class="position-block">
+                        <div class="position-title">${position.title}</div>
+                        <div class="ballot-lane">
+                `;
+
+                position.candidates.forEach((candidate, index) => {
+                    const uniqueId = `${key}_c${index}`;
+                    positionHtml += `
+                        <div class="candidate-node" onclick="selectCandidate(this, '${uniqueId}')">
+                            <span>${candidate}</span>
+                            <input type="radio" name="${key}" id="${uniqueId}" value="${candidate}" style="accent-color: var(--success);" required>
+                        </div>
+                    `;
+                });
+
+                positionHtml += `</div></div>`;
+                container.insertAdjacentHTML('beforeend', positionHtml);
+            });
+        } catch (e) {
+            alert("Error parsing critical electoral data map components.");
+        }
+    }
+
+    async function initiateIdentityChallenge(e) {
+        e.preventDefault();
+        const inputMatric = document.getElementById("voterMatricInput").value.trim().toUpperCase();
+        secureContextMatric = inputMatric;
+
+        try {
+            const res = await fetch(`${TARGET_ENDPOINTS}/send-token`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ matric: inputMatric })
+            });
+            const data = await res.json();
+            
+            if (res.ok) {
+                alert("Security code transmitted successfully to database-mapped terminal address.");
+                await fetchAndRenderBallot(); // Prime the data array engine early
+                routeToPanel("panel2");
+            } else {
+                alert(`Rejection Code: ${data.message}`);
+            }
+        } catch {
+            alert("Error: Core api node offline.");
+        }
+    }
+
+    async function submitChallengeToken(e) {
+        e.preventDefault();
+        const inputToken = document.getElementById("voterTokenInput").value.trim();
+        secureContextToken = inputToken;
+
+        try {
+            const res = await fetch(`${TARGET_ENDPOINTS}/verify-token`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ matric: secureContextMatric, token: inputToken })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                document.getElementById("voterBadgeId").innerText = secureContextMatric;
+                routeToPanel("panel3");
+            } else {
+                alert(`Challenge Error: ${data.message}`);
+            }
+        } catch {
+            alert("Transaction validation aborted.");
+        }
+    }
+
+    function selectCandidate(nodeElement, radioId) {
+        const targetRadio = document.getElementById(radioId);
+        targetRadio.checked = true;
+        
+        // Clear previous selected sibling node styles inside this specific block lane only
+        nodeElement.parentElement.querySelectorAll(".candidate-node").forEach(n => n.classList.remove("picked"));
+        nodeElement.classList.add("picked");
+    }
+
+    async function commitElectoralTransaction(e) {
+        e.preventDefault();
+        if (!confirm("Are you sure you want to finalize your choice across all 20 offices? This cannot be undone.")) return;
+
+        // Package selections cleanly into a submission object
+        const finalVotes = {};
+        Object.keys(ballotSchemaCache).forEach((key) => {
+            const selected = document.querySelector(`input[name="${key}"]:checked`);
+            finalVotes[key] = selected ? selected.value : null;
+        });
+
+        try {
+            const res = await fetch(`${TARGET_ENDPOINTS}/commit-ballot`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ 
+                    matric: secureContextMatric, 
+                    token: secureContextToken,
+                    votes: finalVotes 
+                })
+            });
+            const data = await res.json();
+
+            if (res.ok) {
+                alert("🎉 Ballot successfully integrated into backend SQLite register. Identity locked.");
+                location.reload();
+            } else {
+                alert(`Transaction Error: ${data.message}`);
+            }
+        } catch {
+            alert("Critical system writing timeout.");
+        }
+    }
+</script>
+</body>
+</html>
