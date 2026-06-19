@@ -1,53 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUG Electoral Portal</title>
-    <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; padding: 20px; background: #0f0f0f; color: white; }
-        .container { width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
-        button { width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    </style>
-</head>
+<html>
 <body>
-    <div class="container">
-        <h2>Identity Roll Check</h2>
-        <input type="text" id="matricInput" placeholder="Enter Matric Number" style="text-transform: uppercase;">
-        <button onclick="verifyStudent()">VERIFY IDENTITY</button>
+    <div id="app">
+        <div id="step1">
+            <input id="m" placeholder="Matric Number">
+            <button onclick="start()">Verify</button>
+        </div>
+        <div id="step2" style="display:none">
+            <input id="t" placeholder="6-Digit PIN">
+            <button onclick="verify()">Submit</button>
+        </div>
+        <div id="step3" style="display:none">
+            <button onclick="vote()">Vote Candidate A</button>
+        </div>
     </div>
 
     <script>
-        // REPLACE THIS WITH YOUR LIVE RENDER URL (No trailing slash)
-        const API_BASE = "https://sug-voting-system.onrender.com";
+        const API = "https://sug-voting-system.onrender.com";
+        let matric = "";
 
-        async function verifyStudent() {
-            const matric = document.getElementById('matricInput').value.trim().toUpperCase();
-            
-            if (!matric) {
-                alert("Please enter a matric number.");
-                return;
-            }
+        async function start() {
+            matric = document.getElementById('m').value;
+            const r = await fetch(`${API}/api/send-token`, {method:'POST', body:JSON.stringify({matric}), headers:{'Content-Type':'application/json'}});
+            if(r.ok) { document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block'; }
+        }
 
-            try {
-                const response = await fetch(`${API_BASE}/api/send-token`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ matric: matric })
-                });
+        async function verify() {
+            const token = document.getElementById('t').value;
+            const r = await fetch(`${API}/api/verify-token`, {method:'POST', body:JSON.stringify({matric, token}), headers:{'Content-Type':'application/json'}});
+            if(r.ok) { document.getElementById('step2').style.display='none'; document.getElementById('step3').style.display='block'; }
+        }
 
-                const result = await response.json();
-
-                if (response.ok) {
-                    alert("Success: " + result.message + "\nCheck email: " + result.target);
-                } else {
-                    alert("Access Alert: " + result.message);
-                }
-            } catch (error) {
-                alert("Connection Error: Check your internet or Render status.");
-                console.error("Fetch error:", error);
-            }
+        async function vote() {
+            await fetch(`${API}/api/cast-vote`, {method:'POST', body:JSON.stringify({matric}), headers:{'Content-Type':'application/json'}});
+            alert("Vote Successful!");
         }
     </script>
 </body>
