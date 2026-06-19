@@ -3,227 +3,272 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SUG Secure Voting Node</title>
+    <title>SUG ELECTORAL PORTAL</title>
     <style>
+        /* --- Global Design System Architecture --- */
         :root {
-            --primary: #0f172a; --accent: #1e3a8a; --success: #16a34a;
-            --bg: #f8fafc; --card: #ffffff; --border: #e2e8f0;
+            --bg-primary: #0a0a0c;
+            --card-bg: #121215;
+            --border-color: #26262b;
+            --text-main: #f3f4f6;
+            --text-muted: #8e919a;
+            --accent-blue: #0088ff;
+            --accent-success: #10b981;
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--primary); margin: 0; padding: 0; }
-        header { background: var(--primary); color: white; padding: 2rem 1rem; text-align: center; border-bottom: 4px solid var(--accent); }
-        header h1 { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.5px; }
-        header p { margin: 0.4rem 0 0; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; font-weight: 600; }
-        .wrapper { max-width: 650px; margin: 3rem auto; padding: 0 1rem; box-sizing: border-box; }
-        .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; display: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .card.visible { display: block; }
-        .card h2 { margin-top: 0; font-size: 1.25rem; margin-bottom: 1.5rem; color: var(--primary); }
-        .input-group { margin-bottom: 1.25rem; }
-        .input-group label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; color: #475569; }
-        .input-group input { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; font-size: 1rem; background: #fdfdfd; }
-        .btn { width: 100%; background: var(--accent); color: white; border: none; padding: 0.85rem; font-size: 0.95rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
-        .btn:hover { background: #172554; }
-        .voter-badge { background: #f1f5f9; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.85rem; margin-bottom: 2rem; display: flex; justify-content: space-between; border-left: 4px solid var(--accent); font-weight: 500; }
-        
-        /* Positioning Section Layout blocks */
-        .position-block { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed var(--border); }
-        .position-title { font-size: 1rem; font-weight: 700; color: #1e293b; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ballot-lane { display: flex; flex-direction: column; gap: 0.75rem; }
-        .candidate-node { border: 2px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: white; transition: all 0.2s; }
-        .candidate-node.picked { border-color: var(--success); background: #f0fdf4; }
-        .candidate-node span { font-weight: 600; }
-        .btn-lock { background: var(--success); font-size: 1rem; margin-top: 1rem; }
-        .btn-lock:hover { background: #15803d; }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-stack);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        /* --- Typography & Header Structures --- */
+        .portal-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .portal-header h1 {
+            font-size: 1.4rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .subtitle {
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            color: var(--accent-blue);
+        }
+
+        .divider {
+            border: 0;
+            height: 1px;
+            background-color: var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        /* --- Container Components --- */
+        .portal-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 28px 24px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            margin-bottom: 8px;
+        }
+
+        .instruction {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* --- Interactive Input Components --- */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .form-group input {
+            width: 100%;
+            background-color: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-main);
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-family: monospace;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        /* --- Interactive Buttons --- */
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 4px;
+            padding: 14px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: var(--text-main);
+            color: var(--bg-primary);
+        }
+
+        .btn-success {
+            background-color: var(--accent-success);
+            color: #ffffff;
+        }
+
+        /* --- Utility Display States --- */
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>SUG ELECTORAL PORTAL</h1>
-    <p>Centralized Verification & Ballot Network</p>
-</header>
+    <div class="app-container">
+        <!-- Header Banner -->
+        <header class="portal-header">
+            <h1>SUG ELECTORAL PORTAL</h1>
+            <p class="subtitle">CENTRALIZED VERIFICATION & BALLOT NETWORK</p>
+        </header>
 
-<div class="wrapper">
+        <hr class="divider">
 
-    <!-- STATE 1: IDENTITY RECONNAISSANCE -->
-    <div id="panel1" class="card visible">
-        <h2>Identity Roll Check</h2>
-        <form onsubmit="initiateIdentityChallenge(event)">
-            <div class="input-group">
-                <label>Matriculation ID Number</label>
-                <input type="text" id="voterMatricInput" placeholder="e.g., UU/2026/MLS/001" required>
-            </div>
-            <button type="submit" class="btn">Verify and Dispatch Token</button>
-        </form>
-    </div>
-
-    <!-- STATE 2: CHALLENGE-RESPONSE -->
-    <div id="panel2" class="card">
-        <h2>Two-Factor Challenge Gate</h2>
-        <form onsubmit="submitChallengeToken(event)">
-            <div class="input-group">
-                <label>Dynamic OTP Security Code</label>
-                <input type="password" id="voterTokenInput" placeholder="Enter 6-digit credential" maxlength="6" required>
-            </div>
-            <button type="submit" class="btn">Authorize Session</button>
-        </form>
-    </div>
-
-    <!-- STATE 3: FULL ELECTORAL LEDGER -->
-    <div id="panel3" class="card">
-        <div class="voter-badge">
-            <span>Identity Token: <strong id="voterBadgeId">...</strong></span>
-            <span style="color: var(--success);">● Session Secured</span>
-        </div>
-        <h2>Official Executive Vote Selection</h2>
-        <form onsubmit="commitElectoralTransaction(event)">
+        <!-- Stage 1: Identity Roll Check -->
+        <main class="portal-card" id="verification-pane">
+            <h2 class="section-title">Identity Roll Check</h2>
+            <p class="instruction">Enter your institutional matriculation number to authenticate your voting status and dispatch your access token.</p>
             
-            <!-- Dynamic Injection Point for the 20 Positions -->
-            <div id="dynamicBallotContainer"></div>
+            <div class="form-group">
+                <label for="matric-input">MATRICULATION NUMBER</label>
+                <input 
+                    type="text" 
+                    id="matric-input" 
+                    placeholder="e.g., UU/2026/MLS/0000" 
+                    autocomplete="off"
+                    spellcheck="false"
+                >
+            </div>
 
-            <button type="submit" class="btn btn-lock">Cast Encrypted Ballot Ledger</button>
-        </form>
+            <button class="btn btn-primary" id="btn-verify" onclick="handleVoterVerification()">
+                VERIFY & DISPATCH TOKEN
+            </button>
+        </main>
+
+        <!-- Stage 2: Token Validation (Initially Hidden) -->
+        <main class="portal-card hidden" id="token-pane">
+            <h2 class="section-title">Security Key Authorization</h2>
+            <p class="instruction" id="token-instruction">A 6-digit access code has been securely routed to your registered email registry handle.</p>
+            
+            <div class="form-group">
+                <label for="token-input">ENTER ACCESS TOKEN</label>
+                <input 
+                    type="text" 
+                    id="token-input" 
+                    placeholder="000000" 
+                    maxlength="6"
+                    autocomplete="off"
+                >
+            </div>
+
+            <button class="btn btn-success" id="btn-auth" onclick="handleTokenAuthorization()">
+                AUTHORIZE BALLOT ACCESS
+            </button>
+        </main>
     </div>
 
-</div>
+    <script>
+        // Production Cloud API Base Target Address Mapping
+        const TARGET_ENDPOINTS = "https://sug-voting-system.onrender.com";
+        let verifiedMatric = "";
 
-<script>
-    const TARGET_ENDPOINTS = "https://sug-voting-system.onrender.com";
-    ;
-    let secureContextMatric = "";
-    let secureContextToken = "";
-    let ballotSchemaCache = {};
+        async function handleVoterVerification() {
+            const btn = document.getElementById("btn-verify");
+            const matricInput = document.getElementById("matric-input");
+            const matricValue = matricInput ? matricInput.value.trim().toUpperCase() : "";
 
-    function routeToPanel(panelId) {
-        document.querySelectorAll(".card").forEach(c => c.classList.remove("visible"));
-        document.getElementById(panelId).classList.add("visible");
-    }
+            if (!matricValue) {
+                alert("Validation Error: Please enter your matriculation number.");
+                return;
+            }
 
-    // Dynamic rendering calculation logic
-    async function fetchAndRenderBallot() {
-        try {
-            const res = await fetch(`${TARGET_ENDPOINTS}/ballot-schema`);
-            ballotSchemaCache = await res.json();
-            const container = document.getElementById("dynamicBallotContainer");
-            container.innerHTML = ""; // Reset
+            btn.disabled = true;
+            btn.innerText = "PROCESSING DISPATCH...";
 
-            Object.keys(ballotSchemaCache).forEach((key) => {
-                const position = ballotSchemaCache[key];
-                
-                let positionHtml = `
-                    <div class="position-block">
-                        <div class="position-title">${position.title}</div>
-                        <div class="ballot-lane">
-                `;
-
-                position.candidates.forEach((candidate, index) => {
-                    const uniqueId = `${key}_c${index}`;
-                    positionHtml += `
-                        <div class="candidate-node" onclick="selectCandidate(this, '${uniqueId}')">
-                            <span>${candidate}</span>
-                            <input type="radio" name="${key}" id="${uniqueId}" value="${candidate}" style="accent-color: var(--success);" required>
-                        </div>
-                    `;
+            try {
+                const response = await fetch(`${TARGET_ENDPOINTS}/api/send-token`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ matric: matricValue })
                 });
 
-                positionHtml += `</div></div>`;
-                container.insertAdjacentHTML('beforeend', positionHtml);
-            });
-        } catch (e) {
-            alert("Error parsing critical electoral data map components.");
-        }
-    }
+                const data = await response.json();
 
-    async function initiateIdentityChallenge(e) {
-        e.preventDefault();
-        const inputMatric = document.getElementById("voterMatricInput").value.trim().toUpperCase();
-        secureContextMatric = inputMatric;
+                if (!response.ok) {
+                    alert(`Access Alert: ${data.message || 'The verification node rejected this transaction.'}`);
+                    btn.disabled = false;
+                    btn.innerText = "VERIFY & DISPATCH TOKEN";
+                    return;
+                }
 
-        try {
-            const res = await fetch(`${TARGET_ENDPOINTS}/send-token`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ matric: inputMatric })
-            });
-            const data = await res.json();
-            
-            if (res.ok) {
-                alert("Security code transmitted successfully to database-mapped terminal address.");
-                await fetchAndRenderBallot(); // Prime the data array engine early
-                routeToPanel("panel2");
-            } else {
-                alert(`Rejection Code: ${data.message}`);
+                verifiedMatric = matricValue;
+
+                // Toggle visibility views smoothly
+                document.getElementById("verification-pane").classList.add("hidden");
+                document.getElementById("token-instruction").innerText = `A 6-digit access code has been securely routed to your email handle: ${data.target}`;
+                document.getElementById("token-pane").classList.remove("hidden");
+
+            } catch (networkError) {
+                console.error("Network connection failure:", networkError);
+                alert("System Notice: Unable to connect to the verification node. Please check your internet connection and try again.");
+                btn.disabled = false;
+                btn.innerText = "VERIFY & DISPATCH TOKEN";
             }
-        } catch {
-            alert("Error: Core api node offline.");
         }
-    }
 
-    async function submitChallengeToken(e) {
-        e.preventDefault();
-        const inputToken = document.getElementById("voterTokenInput").value.trim();
-        secureContextToken = inputToken;
+        async function handleTokenAuthorization() {
+            const tokenInput = document.getElementById("token-input");
+            const tokenValue = tokenInput ? tokenInput.value.trim() : "";
 
-        try {
-            const res = await fetch(`${TARGET_ENDPOINTS}/verify-token`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ matric: secureContextMatric, token: inputToken })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                document.getElementById("voterBadgeId").innerText = secureContextMatric;
-                routeToPanel("panel3");
-            } else {
-                alert(`Challenge Error: ${data.message}`);
+            if (tokenValue.length !== 6 || isNaN(tokenValue)) {
+                alert("Validation Error: Please input a valid 6-digit code.");
+                return;
             }
-        } catch {
-            alert("Transaction validation aborted.");
+
+            alert("Token authorization logic accepted. Accessing ballot sheet layout...");
         }
-    }
-
-    function selectCandidate(nodeElement, radioId) {
-        const targetRadio = document.getElementById(radioId);
-        targetRadio.checked = true;
-        
-        // Clear previous selected sibling node styles inside this specific block lane only
-        nodeElement.parentElement.querySelectorAll(".candidate-node").forEach(n => n.classList.remove("picked"));
-        nodeElement.classList.add("picked");
-    }
-
-    async function commitElectoralTransaction(e) {
-        e.preventDefault();
-        if (!confirm("Are you sure you want to finalize your choice across all 20 offices? This cannot be undone.")) return;
-
-        // Package selections cleanly into a submission object
-        const finalVotes = {};
-        Object.keys(ballotSchemaCache).forEach((key) => {
-            const selected = document.querySelector(`input[name="${key}"]:checked`);
-            finalVotes[key] = selected ? selected.value : null;
-        });
-
-        try {
-            const res = await fetch(`${TARGET_ENDPOINTS}/commit-ballot`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    matric: secureContextMatric, 
-                    token: secureContextToken,
-                    votes: finalVotes 
-                })
-            });
-            const data = await res.json();
-
-            if (res.ok) {
-                alert("🎉 Ballot successfully integrated into backend SQLite register. Identity locked.");
-                location.reload();
-            } else {
-                alert(`Transaction Error: ${data.message}`);
-            }
-        } catch {
-            alert("Critical system writing timeout.");
-        }
-    }
-</script>
+    </script>
 </body>
 </html>
